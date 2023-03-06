@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Leitor de QR Code</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jsqr/0.6.2/jsQR.min.js"></script>
+</head>
+<body>
+	<h1>Leitor de QR Code</h1>
+	<video id="video" width="300" height="200"></video>
+	<canvas id="canvas" width="300" height="200"></canvas>
+
+	<script>
+		var video = document.getElementById('video');
+		var canvas = document.getElementById('canvas');
+		var ctx = canvas.getContext('2d');
+
+		navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+			video.srcObject = stream;
+			video.play();
+			requestAnimationFrame(tick);
+		});
+
+		function tick() {
+			if(video.readyState === video.HAVE_ENOUGH_DATA) {
+				ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+				var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+				var code = jsQR(imageData.data, imageData.width, imageData.height);
+				if(code) {
+					alert("QR Code lido: " + code.data);
+				}
+			}
+			requestAnimationFrame(tick);
+		}
+	</script>
+</body>
+</html>
